@@ -1,20 +1,16 @@
-import pandas as pd
-
 from app.models.transaction import Transaction
 
 
-def import_transactions(
-    file_path,
+def save_transactions(
+    transactions,
     db,
     user_id,
     document_id
 ):
 
-    df = pd.read_csv(file_path)
-
     count = 0
 
-    for _, row in df.iterrows():
+    for item in transactions:
 
         transaction = Transaction(
 
@@ -22,25 +18,19 @@ def import_transactions(
 
             document_id=document_id,
 
-            transaction_id=row["Transaction_ID"],
+            transaction_id=item["transaction_id"],
 
-            date=pd.to_datetime(
-                row["Date"]
-            ).date(),
+            date=item["date"],
 
-            transaction_description=row[
-                "Transaction_Description"
-            ],
+            transaction_description=item["transaction_description"],
 
-            merchant_name=row["Merchant_Name"],
+            merchant_name=item["merchant_name"],
 
-            amount=float(row["Amount"]),
+            amount=item["amount"],
 
-            transaction_type=row[
-                "Transaction_Type"
-            ],
+            transaction_type=item["transaction_type"],
 
-            category=row["Category"]
+            category=item["category"]
 
         )
 

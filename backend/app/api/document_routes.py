@@ -10,7 +10,9 @@ from app.auth.dependencies import get_current_user
 from app.models.user import User
 from app.models.document import Document
 
-from app.services.transaction_service import import_transactions
+from app.services.parsers.csv_parser import parse_csv
+from app.services.transaction_service import save_transactions
+from app.services.document_service import process_document
 
 
 router = APIRouter(
@@ -30,66 +32,8 @@ async def upload_document(
 
 ):
 
-    user_folder = f"uploads/user_{current_user.id}"
-
-    os.makedirs(
-        user_folder,
-        exist_ok=True
+    return process_document(
+        file=file,
+        db=db,
+        current_user=current_user
     )
-
-    file_path = os.path.join(
-        user_folder,
-        file.filename
-    )
-
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(
-            file.file,
-            buffer
-        )
-
-    document = Document(
-
-        user_id=current_user.id,
-
-        file_name=file.filename,
-
-        file_path=file_path,
-
-        file_type=file.filename.split(".")[-1].lower(),
-
-        processing_status="COMPLETED"
-
-    )
-
-    db.add(document)
-
-    db.commit()
-
-    db.refresh(document)
-
-    inserted = 0
-
-    if file.filename.lower().endswith(".csv"):
-
-        inserted = import_transactions(
-
-            file_path=file_path,
-
-            db=db,
-
-            user_id=current_user.id,
-
-            document_id=document.id
-
-        )
-
-    return {
-
-        "message": "Upload successful",
-
-        "document_id": document.id,
-
-        "transactions_imported": inserted
-
-    }
