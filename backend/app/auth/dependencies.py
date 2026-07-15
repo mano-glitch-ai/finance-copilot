@@ -14,21 +14,22 @@ def get_current_user(
     db: Session = Depends(get_db)
 ):
 
-    token = credentials.credentials
+    print("=" * 60)
+    print("RAW HEADER:", credentials)
+    print("TOKEN:", credentials.credentials)
+    print("=" * 60)
 
-    payload = verify_token(token)
+    payload = verify_token(credentials.credentials)
+
+    print("PAYLOAD:", payload)
 
     email = payload.get("sub")
-
-    if email is None:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token"
-        )
 
     user = db.query(User).filter(
         User.email == email
     ).first()
+
+    print("USER:", user)
 
     if user is None:
         raise HTTPException(
