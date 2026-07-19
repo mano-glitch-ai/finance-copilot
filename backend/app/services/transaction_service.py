@@ -8,7 +8,7 @@ def save_transactions(
     document_id
 ):
 
-    count = 0
+    inserted_transactions = []
 
     for item in transactions:
 
@@ -36,8 +36,11 @@ def save_transactions(
 
         db.add(transaction)
 
-        count += 1
+        inserted_transactions.append(transaction)
 
     db.commit()
 
-    return count
+    for transaction in inserted_transactions:
+        db.refresh(transaction)
+
+    return inserted_transactions

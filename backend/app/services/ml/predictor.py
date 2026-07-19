@@ -45,7 +45,5 @@ def predict_category(
     print(f"CONFIDENCE  : {confidence:.2f}")
     print("=" * 50)
 
-    if confidence < 0.70:
-        return "Uncategorized"
 
     return predicted_category

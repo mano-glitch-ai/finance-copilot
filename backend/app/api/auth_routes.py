@@ -166,5 +166,10 @@ def login(
 
     return {
         "access_token": token,
-        "token_type": "bearer"
-    }
+        "token_type": "bearer",
+        "user": {
+            "id": db_user.id,
+            "name": db_user.full_name,
+            "email": db_user.email
+        }
+    }       

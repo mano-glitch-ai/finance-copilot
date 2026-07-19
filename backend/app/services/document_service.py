@@ -6,6 +6,7 @@ from app.models.document import Document
 from app.services.parsers.parser_factory import parse_document
 from app.services.transaction_service import save_transactions
 from app.services.ml.predictor import predict_category
+from app.services.ai.chroma_service import index_transactions
 
 
 def process_document(file, db, current_user):
@@ -63,11 +64,14 @@ def process_document(file, db, current_user):
             )
 
         # Save transactions
-        inserted = save_transactions(
+        inserted_transactions = save_transactions(
             transactions=transactions,
             db=db,
             user_id=current_user.id,
             document_id=document.id
+        )
+        index_transactions(
+            inserted_transactions
         )
 
         # Update status
@@ -78,7 +82,7 @@ def process_document(file, db, current_user):
         return {
             "message": "Upload successful",
             "document_id": document.id,
-            "transactions_imported": inserted,
+            "transactions_imported": len(inserted_transactions),
             "status": document.processing_status
         }
 
